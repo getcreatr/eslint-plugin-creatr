@@ -17,6 +17,7 @@ module.exports = {
     'quotes': ['error', 'single'],
     'semi': ['error', 'always'],
     'no-unused-vars': ['error', { 'args': 'none' }],
+    'no-mixed-spaces-and-tabs': ['off']
   },
   overrides: [
     {
