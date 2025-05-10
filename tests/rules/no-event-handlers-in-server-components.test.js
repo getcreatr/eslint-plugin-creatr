@@ -3,42 +3,42 @@ import { RuleTester } from 'eslint';
 import rule from '../../lib/rules/no-event-handlers-in-server-components.js';
 
 const ruleTester = new RuleTester({
-	parserOptions: {
-		ecmaVersion: 2022,
-		sourceType: 'module',
-		ecmaFeatures: {
-			jsx: true,
-		},
-	},
+  parserOptions: {
+    ecmaVersion: 2022,
+    sourceType: 'module',
+    ecmaFeatures: {
+      jsx: true,
+    },
+  },
 });
 
 describe('no-event-handlers-in-server-components rule', () => {
-	test('basic valid cases', () => {
-		ruleTester.run('no-event-handlers-in-server-components', rule, {
-			valid: [
-				// Client component with standard event handlers
-				{
-					code: `"use client";
+  test('basic valid cases', () => {
+    ruleTester.run('no-event-handlers-in-server-components', rule, {
+      valid: [
+        // Client component with standard event handlers
+        {
+          code: `"use client";
 export default function Button() {
   return <button onClick={() => console.log('clicked')}>Click me</button>
 }`,
-				},
-				// Client component with single quotes
-				{
-					code: `'use client';
+        },
+        // Client component with single quotes
+        {
+          code: `'use client';
 export default function Button() {
   return <button onClick={() => console.log('clicked')}>Click me</button>
 }`,
-				},
-				// Server component without event handlers
-				{
-					code: `export default function ServerComponent() {
+        },
+        // Server component without event handlers
+        {
+          code: `export default function ServerComponent() {
   return <div className="server">Static content</div>
 }`,
-				},
-				// Server component with regular props
-				{
-					code: `export default function Card({ title, content, onlyShow }) {
+        },
+        // Server component with regular props
+        {
+          code: `export default function Card({ title, content, onlyShow }) {
   return (
     <div className="card">
       <h2>{title}</h2>
@@ -46,43 +46,43 @@ export default function Button() {
     </div>
   )
 }`,
-				},
-				// Props that look like event handlers but aren't
-				{
-					code: `export default function Component() {
+        },
+        // Props that look like event handlers but aren't
+        {
+          code: `export default function Component() {
   return <div onlyShow={true} oncePerDay={false}>Content</div>
 }`,
-				},
-				// Server component with data attributes
-				{
-					code: `export default function Component() {
+        },
+        // Server component with data attributes
+        {
+          code: `export default function Component() {
   return <div data-onclick="handler">Content</div>
 }`,
-				},
-			],
-			invalid: []
-		});
-	});
+        },
+      ],
+      invalid: []
+    });
+  });
 
-	test('invalid basic cases', () => {
-		ruleTester.run('no-event-handlers-in-server-components', rule, {
-			valid: [],
-			invalid: [
-				// Simple onClick handler
-				{
-					code: `export default function Button() {
+  test('invalid basic cases', () => {
+    ruleTester.run('no-event-handlers-in-server-components', rule, {
+      valid: [],
+      invalid: [
+        // Simple onClick handler
+        {
+          code: `export default function Button() {
   return <button onClick={() => console.log('clicked')}>Click me</button>
 }`,
-					errors: [
-						{
-							messageId: 'noInlineEventHandler',
-							data: { eventHandler: 'onClick' }
-						},
-					],
-				},
-				// Multiple event handlers
-				{
-					code: `export default function Form() {
+          errors: [
+            {
+              messageId: 'noInlineEventHandler',
+              data: { eventHandler: 'onClick' }
+            },
+          ],
+        },
+        // Multiple event handlers
+        {
+          code: `export default function Form() {
   return (
     <form onSubmit={(e) => e.preventDefault()}>
       <input onChange={(e) => console.log(e.target.value)} />
@@ -90,32 +90,32 @@ export default function Button() {
     </form>
   )
 }`,
-					errors: [
-						{
-							messageId: 'noInlineEventHandler',
-							data: { eventHandler: 'onSubmit' }
-						},
-						{
-							messageId: 'noInlineEventHandler',
-							data: { eventHandler: 'onChange' }
-						},
-						{
-							messageId: 'noInlineEventHandler',
-							data: { eventHandler: 'onClick' }
-						},
-					],
-				},
-			]
-		});
-	});
+          errors: [
+            {
+              messageId: 'noInlineEventHandler',
+              data: { eventHandler: 'onSubmit' }
+            },
+            {
+              messageId: 'noInlineEventHandler',
+              data: { eventHandler: 'onChange' }
+            },
+            {
+              messageId: 'noInlineEventHandler',
+              data: { eventHandler: 'onClick' }
+            },
+          ],
+        },
+      ]
+    });
+  });
 
-	test('different event handler types', () => {
-		ruleTester.run('no-event-handlers-in-server-components', rule, {
-			valid: [],
-			invalid: [
-				// DOM event handlers
-				{
-					code: `export default function Component() {
+  test('different event handler types', () => {
+    ruleTester.run('no-event-handlers-in-server-components', rule, {
+      valid: [],
+      invalid: [
+        // DOM event handlers
+        {
+          code: `export default function Component() {
   return (
     <div
       onClick={() => {}}
@@ -131,160 +131,160 @@ export default function Button() {
     </div>
   )
 }`,
-					errors: [
-						{ messageId: 'noInlineEventHandler', data: { eventHandler: 'onClick' } },
-						{ messageId: 'noInlineEventHandler', data: { eventHandler: 'onMouseOver' } },
-						{ messageId: 'noInlineEventHandler', data: { eventHandler: 'onKeyDown' } },
-						{ messageId: 'noInlineEventHandler', data: { eventHandler: 'onFocus' } },
-						{ messageId: 'noInlineEventHandler', data: { eventHandler: 'onBlur' } },
-						{ messageId: 'noInlineEventHandler', data: { eventHandler: 'onScroll' } },
-						{ messageId: 'noInlineEventHandler', data: { eventHandler: 'onDragStart' } },
-						{ messageId: 'noInlineEventHandler', data: { eventHandler: 'onTouchStart' } },
-					],
-				},
-				// Custom event handlers
-				{
-					code: `export default function Component() {
+          errors: [
+            { messageId: 'noInlineEventHandler', data: { eventHandler: 'onClick' } },
+            { messageId: 'noInlineEventHandler', data: { eventHandler: 'onMouseOver' } },
+            { messageId: 'noInlineEventHandler', data: { eventHandler: 'onKeyDown' } },
+            { messageId: 'noInlineEventHandler', data: { eventHandler: 'onFocus' } },
+            { messageId: 'noInlineEventHandler', data: { eventHandler: 'onBlur' } },
+            { messageId: 'noInlineEventHandler', data: { eventHandler: 'onScroll' } },
+            { messageId: 'noInlineEventHandler', data: { eventHandler: 'onDragStart' } },
+            { messageId: 'noInlineEventHandler', data: { eventHandler: 'onTouchStart' } },
+          ],
+        },
+        // Custom event handlers
+        {
+          code: `export default function Component() {
   return <CustomComponent onCustomEvent={() => {}} onSpecialAction={() => {}} />
 }`,
-					errors: [
-						{ messageId: 'noInlineEventHandler', data: { eventHandler: 'onCustomEvent' } },
-						{ messageId: 'noInlineEventHandler', data: { eventHandler: 'onSpecialAction' } },
-					],
-				},
-			]
-		});
-	});
+          errors: [
+            { messageId: 'noInlineEventHandler', data: { eventHandler: 'onCustomEvent' } },
+            { messageId: 'noInlineEventHandler', data: { eventHandler: 'onSpecialAction' } },
+          ],
+        },
+      ]
+    });
+  });
 
-	test('different ways to pass event handlers', () => {
-		ruleTester.run('no-event-handlers-in-server-components', rule, {
-			valid: [],
-			invalid: [
-				// Function reference
-				{
-					code: `export default function Component() {
+  test('different ways to pass event handlers', () => {
+    ruleTester.run('no-event-handlers-in-server-components', rule, {
+      valid: [],
+      invalid: [
+        // Function reference
+        {
+          code: `export default function Component() {
   const handleClick = () => console.log('clicked');
   return <button onClick={handleClick}>Button</button>
 }`,
-					errors: [
-						{
-							messageId: 'noEventHandlerInServer',
-							data: { eventHandler: 'onClick' }
-						},
-					],
-				},
-				// Method call
-				{
-					code: `export default function Component() {
+          errors: [
+            {
+              messageId: 'noEventHandlerInServer',
+              data: { eventHandler: 'onClick' }
+            },
+          ],
+        },
+        // Method call
+        {
+          code: `export default function Component() {
   const obj = { method: () => {} };
   return <button onClick={obj.method}>Button</button>
 }`,
-					errors: [
-						{
-							messageId: 'noEventHandlerInServer',
-							data: { eventHandler: 'onClick' }
-						},
-					],
-				},
-				// Bound function
-				{
-					code: `export default function Component() {
+          errors: [
+            {
+              messageId: 'noEventHandlerInServer',
+              data: { eventHandler: 'onClick' }
+            },
+          ],
+        },
+        // Bound function
+        {
+          code: `export default function Component() {
   const handler = () => {};
   return <button onClick={handler.bind(this)}>Button</button>
 }`,
-					errors: [
-						{
-							messageId: 'noEventHandlerInServer',
-							data: { eventHandler: 'onClick' }
-						},
-					],
-				},
-				// Function expression
-				{
-					code: `export default function Component() {
+          errors: [
+            {
+              messageId: 'noEventHandlerInServer',
+              data: { eventHandler: 'onClick' }
+            },
+          ],
+        },
+        // Function expression
+        {
+          code: `export default function Component() {
   return <button onClick={function() { console.log('clicked') }}>Button</button>
 }`,
-					errors: [
-						{
-							messageId: 'noInlineEventHandler',
-							data: { eventHandler: 'onClick' }
-						},
-					],
-				},
-			]
-		});
-	});
+          errors: [
+            {
+              messageId: 'noInlineEventHandler',
+              data: { eventHandler: 'onClick' }
+            },
+          ],
+        },
+      ]
+    });
+  });
 
-	test('edge cases with use client directive', () => {
-		ruleTester.run('no-event-handlers-in-server-components', rule, {
-			valid: [
-				// Use client with extra whitespace
-				{
-					code: `"use client"  ;
+  test('edge cases with use client directive', () => {
+    ruleTester.run('no-event-handlers-in-server-components', rule, {
+      valid: [
+        // Use client with extra whitespace
+        {
+          code: `"use client"  ;
 export default function Button() {
   return <button onClick={() => {}}>Click</button>
 }`,
-				},
-				// Use client with backticks
-				{
-					code: `\`use client\`;
+        },
+        // Use client with backticks
+        {
+          code: `\`use client\`;
 export default function Button() {
   return <button onClick={() => {}}>Click</button>
 }`,
-				},
-			],
-			invalid: [
-				// Use client not at the top
-				{
-					code: `import React from 'react';
+        },
+      ],
+      invalid: [
+        // Use client not at the top
+        {
+          code: `import React from 'react';
 "use client";
 export default function Button() {
   return <button onClick={() => {}}>Click</button>
 }`,
-					errors: [
-						{
-							messageId: 'noInlineEventHandler',
-							data: { eventHandler: 'onClick' }
-						},
-					],
-				},
-				// Use client in wrong format
-				{
-					code: `"use-client";
+          errors: [
+            {
+              messageId: 'noInlineEventHandler',
+              data: { eventHandler: 'onClick' }
+            },
+          ],
+        },
+        // Use client in wrong format
+        {
+          code: `"use-client";
 export default function Button() {
   return <button onClick={() => {}}>Click</button>
 }`,
-					errors: [
-						{
-							messageId: 'noInlineEventHandler',
-							data: { eventHandler: 'onClick' }
-						},
-					],
-				},
-				// Use client as comment
-				{
-					code: `// "use client"
+          errors: [
+            {
+              messageId: 'noInlineEventHandler',
+              data: { eventHandler: 'onClick' }
+            },
+          ],
+        },
+        // Use client as comment
+        {
+          code: `// "use client"
 export default function Button() {
   return <button onClick={() => {}}>Click</button>
 }`,
-					errors: [
-						{
-							messageId: 'noInlineEventHandler',
-							data: { eventHandler: 'onClick' }
-						},
-					],
-				},
-			]
-		});
-	});
+          errors: [
+            {
+              messageId: 'noInlineEventHandler',
+              data: { eventHandler: 'onClick' }
+            },
+          ],
+        },
+      ]
+    });
+  });
 
-	test('complex JSX structures', () => {
-		ruleTester.run('no-event-handlers-in-server-components', rule, {
-			valid: [],
-			invalid: [
-				// Nested components
-				{
-					code: `export default function Component() {
+  test('complex JSX structures', () => {
+    ruleTester.run('no-event-handlers-in-server-components', rule, {
+      valid: [],
+      invalid: [
+        // Nested components
+        {
+          code: `export default function Component() {
   return (
     <div>
       <header>
@@ -298,15 +298,15 @@ export default function Button() {
     </div>
   )
 }`,
-					errors: [
-						{ messageId: 'noInlineEventHandler', data: { eventHandler: 'onClick' } },
-						{ messageId: 'noInlineEventHandler', data: { eventHandler: 'onSubmit' } },
-						{ messageId: 'noInlineEventHandler', data: { eventHandler: 'onChange' } },
-					],
-				},
-				// Fragment syntax
-				{
-					code: `export default function Component() {
+          errors: [
+            { messageId: 'noInlineEventHandler', data: { eventHandler: 'onClick' } },
+            { messageId: 'noInlineEventHandler', data: { eventHandler: 'onSubmit' } },
+            { messageId: 'noInlineEventHandler', data: { eventHandler: 'onChange' } },
+          ],
+        },
+        // Fragment syntax
+        {
+          code: `export default function Component() {
   return (
     <>
       <button onClick={() => {}}>Button 1</button>
@@ -314,28 +314,28 @@ export default function Button() {
     </>
   )
 }`,
-					errors: [
-						{ messageId: 'noInlineEventHandler', data: { eventHandler: 'onClick' } },
-						{ messageId: 'noInlineEventHandler', data: { eventHandler: 'onClick' } },
-					],
-				},
-				// Conditional rendering
-				{
-					code: `export default function Component({ show }) {
+          errors: [
+            { messageId: 'noInlineEventHandler', data: { eventHandler: 'onClick' } },
+            { messageId: 'noInlineEventHandler', data: { eventHandler: 'onClick' } },
+          ],
+        },
+        // Conditional rendering
+        {
+          code: `export default function Component({ show }) {
   return show ? (
     <button onClick={() => {}}>Shown</button>
   ) : (
     <button onClick={() => {}}>Hidden</button>
   )
 }`,
-					errors: [
-						{ messageId: 'noInlineEventHandler', data: { eventHandler: 'onClick' } },
-						{ messageId: 'noInlineEventHandler', data: { eventHandler: 'onClick' } },
-					],
-				},
-				// Map with event handlers
-				{
-					code: `export default function Component({ items }) {
+          errors: [
+            { messageId: 'noInlineEventHandler', data: { eventHandler: 'onClick' } },
+            { messageId: 'noInlineEventHandler', data: { eventHandler: 'onClick' } },
+          ],
+        },
+        // Map with event handlers
+        {
+          code: `export default function Component({ items }) {
   return (
     <ul>
       {items.map(item => (
@@ -346,101 +346,101 @@ export default function Button() {
     </ul>
   )
 }`,
-					errors: [
-						{ messageId: 'noInlineEventHandler', data: { eventHandler: 'onClick' } },
-					],
-				},
-			]
-		});
-	});
+          errors: [
+            { messageId: 'noInlineEventHandler', data: { eventHandler: 'onClick' } },
+          ],
+        },
+      ]
+    });
+  });
 
-	test('limitations with spread props', () => {
-		ruleTester.run('no-event-handlers-in-server-components', rule, {
-			valid: [
-				// Event handler in spread props - LIMITATION: not detected by static analysis
-				{
-					code: `export default function Component() {
+  test('limitations with spread props', () => {
+    ruleTester.run('no-event-handlers-in-server-components', rule, {
+      valid: [
+        // Event handler in spread props - LIMITATION: not detected by static analysis
+        {
+          code: `export default function Component() {
   const props = { onClick: () => {} };
   return <button {...props}>Button</button>
 }`,
-				},
-				// Direct spread with event handler - LIMITATION: not detected by static analysis
-				{
-					code: `export default function Component() {
+        },
+        // Direct spread with event handler - LIMITATION: not detected by static analysis
+        {
+          code: `export default function Component() {
   return <button {...{ onClick: () => {} }}>Button</button>
 }`,
-				},
-				// Computed property names - LIMITATION: not detected by static analysis
-				{
-					code: `export default function Component() {
+        },
+        // Computed property names - LIMITATION: not detected by static analysis
+        {
+          code: `export default function Component() {
   const handlerName = 'onClick';
   return <button {...{ [handlerName]: () => {} }}>Button</button>
 }`,
-				},
-				// Spread from function result - LIMITATION: not detected by static analysis
-				{
-					code: `export default function Component() {
+        },
+        // Spread from function result - LIMITATION: not detected by static analysis
+        {
+          code: `export default function Component() {
   const getProps = () => ({ onClick: () => {} });
   return <button {...getProps()}>Button</button>
 }`,
-				},
-			],
-			invalid: []  // Empty invalid array is valid for RuleTester
-		});
-	});
+        },
+      ],
+      invalid: []  // Empty invalid array is valid for RuleTester
+    });
+  });
 
-	test('with options', () => {
-		ruleTester.run('no-event-handlers-in-server-components', rule, {
-			valid: [
-				// Allow specific event handlers
-				{
-					code: `export default function Component() {
+  test('with options', () => {
+    ruleTester.run('no-event-handlers-in-server-components', rule, {
+      valid: [
+        // Allow specific event handlers
+        {
+          code: `export default function Component() {
   return <div onLoad={() => {}} onError={() => {}}>Content</div>
 }`,
-					options: [{ allowedEventHandlers: ['onLoad', 'onError'] }],
-				},
-				// Don't check custom components
-				{
-					code: `import CustomButton from './CustomButton'
+          options: [{ allowedEventHandlers: ['onLoad', 'onError'] }],
+        },
+        // Don't check custom components
+        {
+          code: `import CustomButton from './CustomButton'
 
 export default function Page() {
   return <CustomButton onClick={() => {}} />
 }`,
-					options: [{ checkCustomComponents: false }],
-				},
-			],
-			invalid: [
-				// Only allowed specific handlers
-				{
-					code: `export default function Component() {
+          options: [{ checkCustomComponents: false }],
+        },
+      ],
+      invalid: [
+        // Only allowed specific handlers
+        {
+          code: `export default function Component() {
   return <div onLoad={() => {}} onClick={() => {}}>Content</div>
 }`,
-					options: [{ allowedEventHandlers: ['onLoad'] }],
-					errors: [
-						{ messageId: 'noInlineEventHandler', data: { eventHandler: 'onClick' } },
-					],
-				},
-				// Still check HTML elements when custom components disabled
-				{
-					code: `export default function Component() {
+          options: [{ allowedEventHandlers: ['onLoad'] }],
+          errors: [
+            { messageId: 'noInlineEventHandler', data: { eventHandler: 'onClick' } },
+          ],
+        },
+        // Still check HTML elements when custom components disabled
+        {
+          code: `export default function Component() {
   return <button onClick={() => {}}>Click</button>
 }`,
-					options: [{ checkCustomComponents: false }],
-					errors: [
-						{ messageId: 'noInlineEventHandler', data: { eventHandler: 'onClick' } },
-					],
-				},
-			],
-		});
-	});
+          options: [{ checkCustomComponents: false }],
+          errors: [
+            { messageId: 'noInlineEventHandler', data: { eventHandler: 'onClick' } },
+          ],
+        },
+      ],
+    });
+  });
 
-	test('real-world scenarios', () => {
-		ruleTester.run('no-event-handlers-in-server-components', rule, {
-			valid: [],
-			invalid: [
-				// Your original NotFound component
-				{
-					code: `import React from "react"
+  test('real-world scenarios', () => {
+    ruleTester.run('no-event-handlers-in-server-components', rule, {
+      valid: [],
+      invalid: [
+        // Your original NotFound component
+        {
+          code: `import React from "react"
 import Link from "next/link"
 import { ArrowLeft, Home } from "lucide-react"
 
@@ -466,13 +466,13 @@ export default function NotFound() {
     </div>
   )
 }`,
-					errors: [
-						{ messageId: 'noInlineEventHandler', data: { eventHandler: 'onClick' } },
-					],
-				},
-				// Complex form component
-				{
-					code: `export default function ContactForm() {
+          errors: [
+            { messageId: 'noInlineEventHandler', data: { eventHandler: 'onClick' } },
+          ],
+        },
+        // Complex form component
+        {
+          code: `export default function ContactForm() {
   const handleSubmit = (e) => {
     e.preventDefault();
     // submit logic
@@ -500,16 +500,16 @@ export default function NotFound() {
     </form>
   )
 }`,
-					errors: [
-						{ messageId: 'noEventHandlerInServer', data: { eventHandler: 'onSubmit' } },
-						{ messageId: 'noInlineEventHandler', data: { eventHandler: 'onChange' } },
-						{ messageId: 'noInlineEventHandler', data: { eventHandler: 'onBlur' } },
-						{ messageId: 'noInlineEventHandler', data: { eventHandler: 'onChange' } },
-						{ messageId: 'noInlineEventHandler', data: { eventHandler: 'onFocus' } },
-						{ messageId: 'noInlineEventHandler', data: { eventHandler: 'onClick' } },
-					],
-				},
-			]
-		});
-	});
+          errors: [
+            { messageId: 'noEventHandlerInServer', data: { eventHandler: 'onSubmit' } },
+            { messageId: 'noInlineEventHandler', data: { eventHandler: 'onChange' } },
+            { messageId: 'noInlineEventHandler', data: { eventHandler: 'onBlur' } },
+            { messageId: 'noInlineEventHandler', data: { eventHandler: 'onChange' } },
+            { messageId: 'noInlineEventHandler', data: { eventHandler: 'onFocus' } },
+            { messageId: 'noInlineEventHandler', data: { eventHandler: 'onClick' } },
+          ],
+        },
+      ]
+    });
+  });
 });
