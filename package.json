@@ -36,7 +36,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/getcreatr/eslint-plugin-creatr.git"
+    "url": "git+https://github.com/getcreatr/eslint-plugin-creatr.git"
   },
   "bugs": {
     "url": "https://github.com/getcreatr/eslint-plugin-creatr/issues"
