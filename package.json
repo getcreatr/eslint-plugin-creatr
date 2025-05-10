@@ -9,7 +9,8 @@
   "scripts": {
     "test": "mocha tests/**/*.js",
     "lint": "eslint lib tests",
-    "prepublishOnly": "bun test && bun run lint"
+    "prepublishOnly": "bun test && bun run lint",
+    "push": "bun test && bun run lint && npm version patch && npm publish"
   },
   "keywords": [
     "eslint",
