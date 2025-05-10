@@ -1,0 +1,47 @@
+{
+  "name": "eslint-plugin-creatr",
+  "version": "1.0.0",
+  "description": "Custom ESLint rules for Next.js projects by Creatr",
+  "main": "lib/index.js",
+  "files": [
+    "lib"
+  ],
+  "scripts": {
+    "test": "mocha tests/**/*.js",
+    "lint": "eslint lib tests",
+    "prepublishOnly": "bun test && bun run lint"
+  },
+  "keywords": [
+    "eslint",
+    "eslintplugin",
+    "eslint-plugin",
+    "next.js",
+    "nextjs",
+    "react",
+    "creatr"
+  ],
+  "author": "Prince Mendiratta <prince@getcreatr.com>",
+  "license": "MIT",
+  "peerDependencies": {
+    "typescript": "^5.0.0"
+  },
+  "devDependencies": {
+    "eslint": "^8.0.0",
+    "mocha": "^10.0.0",
+    "@types/bun": "latest"
+  },
+  "engines": {
+    "node": ">=12.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/getcreatr/eslint-plugin-creatr.git"
+  },
+  "bugs": {
+    "url": "https://github.com/getcreatr/eslint-plugin-creatr/issues"
+  },
+  "homepage": "https://github.com/getcreatr/eslint-plugin-creatr#readme",
+  "dependencies": {
+    "requireindex": "^1.2.0"
+  }
+}
