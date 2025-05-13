@@ -759,4 +759,163 @@ export default function Component() {
       ],
     });
   });
+
+  // Test cases for combined type checks in the no-browser-globals-in-ssr rule
+
+  test('combined type checks', () => {
+    ruleTester.run('no-browser-globals-in-ssr', rule, {
+      valid: [
+        // Combined window and document check
+        {
+          code: `
+export default function Component() {
+  if (typeof window !== 'undefined' && typeof document !== 'undefined') {
+    const linkElement = document.createElement('a');
+    linkElement.setAttribute('href', 'https://example.com');
+    linkElement.click();
+  }
+  return <div>Component</div>;
+}`,
+        },
+        // Combined check with multiple browser globals
+        {
+          code: `
+export default function Component() {
+  if (typeof window !== 'undefined' && typeof localStorage !== 'undefined') {
+    window.localStorage.setItem('key', 'value');
+    console.log(window.location.href);
+  }
+  return <div>Component</div>;
+}`,
+        },
+        // Combined check with OR operator
+        {
+          code: `
+export default function Component() {
+  const isBrowser = typeof window !== 'undefined' || typeof document !== 'undefined';
+  if (isBrowser && typeof document !== 'undefined') {
+    document.title = 'Title';
+  }
+  return <div>Component</div>;
+}`,
+        },
+        // Combined check in ternary
+        {
+          code: `
+export default function Component() {
+  const element = typeof window !== 'undefined' && typeof document !== 'undefined' 
+    ? document.createElement('div') 
+    : null;
+  return <div>{element}</div>;
+}`,
+        },
+        // Real-world case: export functionality with combined check
+        {
+          code: `
+export default function Component() {
+  const exportData = () => {
+    const data = "content-to-export";
+    const dataUri = \`data:text/plain;charset=utf-8,\${encodeURIComponent(data)}\`;
+    
+    // Combined check before using document
+    if (typeof window !== 'undefined' && typeof document !== 'undefined') {
+      const linkElement = document.createElement('a');
+      linkElement.setAttribute('href', dataUri);
+      linkElement.setAttribute('download', 'export.txt');
+      linkElement.click();
+    }
+  };
+  
+  return <button onClick={exportData}>Export</button>;
+}`,
+        },
+        // Nested checks
+        {
+          code: `
+export default function Component() {
+  if (typeof window !== 'undefined') {
+    if (typeof document !== 'undefined') {
+      document.title = 'Title';
+    }
+    window.addEventListener('resize', () => {});
+  }
+  return <div>Component</div>;
+}`,
+        },
+        // Real-world FeedbackOrchestrator case
+        {
+          code: `
+export default function Component() {
+  const exportAnalysis = () => {
+    const dataStr = JSON.stringify({});
+    const dataUri = \`data:application/json;charset=utf-8,\${encodeURIComponent(dataStr)}\`;
+    const exportFileName = 'export.json';
+    
+    // Check if we're in a browser environment before using document
+    if (typeof window !== 'undefined' && typeof document !== 'undefined') {
+      const linkElement = document.createElement('a');
+      linkElement.setAttribute('href', dataUri);
+      linkElement.setAttribute('download', exportFileName);
+      linkElement.click();
+    }
+  };
+  
+  return <button onClick={exportAnalysis}>Export Analysis</button>;
+}`,
+        },
+      ],
+      invalid: [
+        // Missing check for document
+        {
+          code: `
+export default function Component() {
+  if (typeof window !== 'undefined') {
+    const linkElement = document.createElement('a'); // Error: missing check for document
+    linkElement.click();
+  }
+  return <div>Component</div>;
+}`,
+          errors: [
+            {
+              message: '\'document\' is not available during server-side rendering. Consider moving this to useEffect, an event handler, or wrap with a typeof check.',
+            },
+          ],
+        },
+        // Incomplete combined check
+        {
+          code: `
+export default function Component() {
+  if (typeof window !== 'undefined' && navigator) { // Error: missing proper check for navigator
+    console.log(navigator.userAgent);
+  }
+  return <div>Component</div>;
+}`,
+          errors: [
+            {
+              message: '\'navigator\' is not available during server-side rendering. Consider moving this to useEffect, an event handler, or wrap with a typeof check.',
+            },
+            {
+              message: '\'navigator\' is not available during server-side rendering. Consider moving this to useEffect, an event handler, or wrap with a typeof check.',
+            },
+          ],
+        },
+        // Multiple globals with incomplete checks
+        {
+          code: `
+export default function Component() {
+  if (typeof window !== 'undefined' && typeof document !== 'undefined') {
+    document.title = 'Safe';
+    localStorage.setItem('key', 'value'); // Error: missing check for localStorage
+  }
+  return <div>Component</div>;
+}`,
+          errors: [
+            {
+              message: '\'localStorage\' is not available during server-side rendering. Consider moving this to useEffect, an event handler, or wrap with a typeof check.',
+            },
+          ],
+        },
+      ],
+    });
+  });
 });
