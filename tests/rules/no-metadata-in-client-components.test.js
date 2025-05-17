@@ -56,10 +56,20 @@ function Component() {
   return <div>{count}</div>
 }`,
         },
+        // Server component with re-exported metadata
+        {
+          code: `import { metadata, viewport } from './metadata';
+
+export { metadata, viewport };
+
+export default function Page() {
+  return <div>About</div>
+}`,
+        },
       ],
 
       invalid: [
-        // Client component with metadata export (without TypeScript)
+        // Client component with direct metadata export
         {
           code: `"use client";
 
@@ -69,6 +79,40 @@ export const metadata = {
   title: 'About Us',
   description: 'Learn about our company',
 }
+
+export default function Page() {
+  return <div>About</div>
+}`,
+          errors: [
+            {
+              messageId: 'noMetadataInClient',
+            },
+          ],
+        },
+        // Client component with re-exported metadata
+        {
+          code: `"use client";
+
+import { metadata, viewport } from './metadata';
+
+export { metadata, viewport };
+
+export default function Page() {
+  return <div>About</div>
+}`,
+          errors: [
+            {
+              messageId: 'noMetadataInClient',
+            },
+          ],
+        },
+        // Re-export with renamed import
+        {
+          code: `"use client";
+
+import { metadata as pageMeta, viewport } from './metadata';
+
+export { pageMeta as metadata, viewport };
 
 export default function Page() {
   return <div>About</div>
