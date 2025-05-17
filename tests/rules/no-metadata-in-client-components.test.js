@@ -29,7 +29,19 @@ export default function Page() {
   return <div>About</div>
 }`,
         },
-        // Client component without metadata
+        // Server component with viewport (no "use client")
+        {
+          code: `
+export const viewport = {
+  width: "device-width",
+  initialScale: 1,
+}
+
+export default function Page() {
+  return <div>Page with viewport</div>
+}`,
+        },
+        // Client component without metadata or viewport
         {
           code: `"use client";
 
@@ -56,7 +68,7 @@ function Component() {
   return <div>{count}</div>
 }`,
         },
-        // Server component with re-exported metadata
+        // Server component with re-exported metadata and viewport
         {
           code: `import { metadata, viewport } from './metadata';
 
@@ -89,6 +101,51 @@ export default function Page() {
             },
           ],
         },
+        // Client component with direct viewport export
+        {
+          code: `"use client";
+
+export const viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+};
+
+export default function Page() {
+  return <div>Page with viewport</div>
+}`,
+          errors: [
+            {
+              messageId: 'noViewportInClient',
+            },
+          ],
+        },
+        // Client component with both metadata and viewport exports
+        {
+          code: `"use client";
+
+export const metadata = {
+  title: 'About Us',
+  description: 'Learn about our company',
+};
+
+export const viewport = {
+  width: "device-width",
+  initialScale: 1,
+};
+
+export default function Page() {
+  return <div>Page with both</div>
+}`,
+          errors: [
+            {
+              messageId: 'noMetadataInClient',
+            },
+            {
+              messageId: 'noViewportInClient',
+            },
+          ],
+        },
         // Client component with re-exported metadata
         {
           code: `"use client";
@@ -103,6 +160,9 @@ export default function Page() {
           errors: [
             {
               messageId: 'noMetadataInClient',
+            },
+            {
+              messageId: 'noViewportInClient',
             },
           ],
         },
@@ -120,6 +180,26 @@ export default function Page() {
           errors: [
             {
               messageId: 'noMetadataInClient',
+            },
+            {
+              messageId: 'noViewportInClient',
+            },
+          ],
+        },
+        // Re-export with renamed viewport
+        {
+          code: `"use client";
+
+import { viewport as pageViewport } from './metadata';
+
+export { pageViewport as viewport };
+
+export default function Page() {
+  return <div>Page</div>
+}`,
+          errors: [
+            {
+              messageId: 'noViewportInClient',
             },
           ],
         },
@@ -160,6 +240,43 @@ export default function AboutPage() {
           errors: [
             {
               messageId: 'noMetadataInClient',
+            },
+          ],
+        },
+        // Example matching your current error
+        {
+          code: `'use client'
+
+import "@/styles/globals.css";
+import React from "react";
+
+import { GeistSans } from "geist/font/sans";
+import { UserProvider } from "@/components/user-context";
+import { Toaster } from "react-hot-toast";
+
+export const viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+};
+
+export default function RootLayout({
+  children,
+}) {
+  return (
+    <html lang="en" className={\`\${GeistSans.variable}\`}>
+      <body>
+        <UserProvider>
+          {children}
+          <Toaster position="top-right" />
+        </UserProvider>
+      </body>
+    </html>
+  );
+}`,
+          errors: [
+            {
+              messageId: 'noViewportInClient',
             },
           ],
         },
