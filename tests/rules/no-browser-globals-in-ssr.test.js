@@ -1015,4 +1015,160 @@ export default function Component() {
       ],
     });
   });
+  // Add new test section for browser check variables
+  test('browser check variables', () => {
+    ruleTester.run('no-browser-globals-in-ssr', rule, {
+      valid: [
+        // Using browser check variable with localStorage
+        {
+          code: `
+export default function Component() {
+  const isBrowser = typeof window !== 'undefined';
+  
+  if (isBrowser) {
+    localStorage.setItem('key', 'value');
+  }
+  
+  return <div>Component</div>;
+}`,
+        },
+        // Using browser check variable with multiple globals
+        {
+          code: `
+export default function Component() {
+  const isClient = typeof window !== 'undefined';
+  
+  const handleClick = () => {
+    if (isClient) {
+      window.location.href = '/new-page';
+      document.title = 'New Page';
+    }
+  };
+  
+  return <button onClick={handleClick}>Navigate</button>;
+}`,
+        },
+        // Browser check variable with different names
+        {
+          code: `
+export default function Component() {
+  const isClient = typeof window !== 'undefined';
+  const runningInBrowser = isClient; // Variable assigned from another browser check variable
+  
+  if (runningInBrowser) {
+    document.title = window.location.href;
+  }
+  
+  return <div>Component</div>;
+}`,
+        },
+        // With try/catch block
+        {
+          code: `
+export default function Component() {
+  const isBrowser = typeof window !== 'undefined';
+  
+  const handleClick = () => {
+    if (isBrowser) {
+      try {
+        localStorage.setItem('key', 'value');
+      } catch (error) {
+        console.error('Error saving to localStorage', error);
+      }
+    }
+  };
+  
+  return <button onClick={handleClick}>Save</button>;
+}`,
+        },
+        // Real-world AuthProvider pattern with explicit test case
+        {
+          code: `
+'use client';
+import { createContext, useContext, useState } from 'react';
+
+export function AuthProvider({ children }) {
+  const isBrowser = typeof window !== 'undefined';
+  if (isBrowser) {
+    document.title = window.location.href; // This should be allowed with the isBrowser check
+  }
+
+  const login = (email, password) => {
+    if (isBrowser) {
+      localStorage.setItem('user', JSON.stringify({ email }));
+    }
+  };
+
+  const logout = () => {
+    if (isBrowser) {
+      localStorage.removeItem('user');
+    }
+  };
+
+  return <div>{children}</div>;
+}`,
+          options: [{ allowInClientComponents: true }],
+        },
+      ],
+      invalid: [
+        // Using browser global without checking the variable
+        {
+          code: `
+export default function Component() {
+  const isBrowser = typeof window !== 'undefined';
+  
+  // Not using the check variable
+  localStorage.setItem('key', 'value');
+  
+  return <div>Component</div>;
+}`,
+          errors: [
+            {
+              message: '\'localStorage\' is not available during server-side rendering. Consider moving this to useEffect, an event handler, or wrap with a typeof check.',
+            },
+          ],
+        },
+        // Check variable in wrong scope
+        {
+          code: `
+export default function Component() {
+  const renderContent = () => {
+    const isBrowser = typeof window !== 'undefined';
+    return <div>Content</div>;
+  };
+  
+  // isBrowser not in scope here
+  if (true) {
+    localStorage.setItem('key', 'value');
+  }
+  
+  return renderContent();
+}`,
+          errors: [
+            {
+              message: '\'localStorage\' is not available during server-side rendering. Consider moving this to useEffect, an event handler, or wrap with a typeof check.',
+            },
+          ],
+        },
+        // Variable that's not a browser check
+        {
+          code: `
+export default function Component() {
+  const isBrowser = true;
+  
+  if (isBrowser) {
+    localStorage.setItem('key', 'value');
+  }
+  
+  return <div>Component</div>;
+}`,
+          errors: [
+            {
+              message: '\'localStorage\' is not available during server-side rendering. Consider moving this to useEffect, an event handler, or wrap with a typeof check.',
+            },
+          ],
+        },
+      ],
+    });
+  });
 });
