@@ -140,6 +140,103 @@ export default function Component() {
     });
   });
 
+  // Add new test section for default parameter values
+  test('default parameter values', () => {
+    ruleTester.run('no-browser-globals-in-ssr', rule, {
+      valid: [
+        // Default parameter with browser global in client component
+        {
+          code: `
+"use client";
+
+export function Component({
+  url = window.location.href
+}) {
+  return <div>{url}</div>;
+}`,
+          options: [{ allowInClientComponents: true }],
+        },
+        // Default parameter in object with browser global in client component
+        {
+          code: `
+"use client";
+
+export function SocialShare({
+  title = 'Check out this amazing content!',
+  description = 'I found this interesting content that I wanted to share with you.',
+  url = window.location.href,
+  image,
+  onShare
+}) {
+  return <div>{url}</div>;
+}`,
+          options: [{ allowInClientComponents: true }],
+        },
+        // Default parameter with typeof check
+        {
+          code: `
+export function Component({
+  url = typeof window !== 'undefined' ? window.location.href : ''
+}) {
+  return <div>{url}</div>;
+}`,
+        },
+      ],
+
+      invalid: [
+        // Default parameter with browser global in non-client component
+        {
+          code: `
+export function Component({
+  url = window.location.href
+}) {
+  return <div>{url}</div>;
+}`,
+          errors: [
+            {
+              message: '\'window\' is not available during server-side rendering. Consider moving this to useEffect, an event handler, or wrap with a typeof check.',
+            },
+          ],
+        },
+        // Default parameter in object with browser global in non-client component
+        {
+          code: `
+export function SocialShare({
+  title = 'Check out this amazing content!',
+  description = 'I found this interesting content that I wanted to share with you.',
+  url = window.location.href,
+  image,
+  onShare
+}) {
+  return <div>{url}</div>;
+}`,
+          errors: [
+            {
+              message: '\'window\' is not available during server-side rendering. Consider moving this to useEffect, an event handler, or wrap with a typeof check.',
+            },
+          ],
+        },
+        // Client component but allowInClientComponents disabled
+        {
+          code: `
+"use client";
+
+export function Component({
+  url = window.location.href
+}) {
+  return <div>{url}</div>;
+}`,
+          options: [{ allowInClientComponents: false }],
+          errors: [
+            {
+              message: '\'window\' is not available during server-side rendering. Consider moving this to useEffect, an event handler, or wrap with a typeof check.',
+            },
+          ],
+        },
+      ],
+    });
+  });
+
   test('JSX attribute expressions', () => {
     ruleTester.run('no-browser-globals-in-ssr', rule, {
       valid: [
