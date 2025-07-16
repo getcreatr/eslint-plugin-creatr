@@ -329,7 +329,7 @@ export default function Component() {
       ],
 
       invalid: [
-        // With "use client" but allowInClientComponents disabled (default)
+        // With "use client" but allowInClientComponents disabled
         {
           code: `
 "use client";
@@ -338,6 +338,7 @@ export default function Component() {
   const url = window.location.href;
   return <div>{url}</div>;
 }`,
+          options: [{ allowInClientComponents: false }],
           errors: [
             {
               message: '\'window\' is not available during server-side rendering. Consider moving this to useEffect, an event handler, or wrap with a typeof check.',
@@ -389,6 +390,24 @@ export default function Component() {
   useLayoutEffect(() => {
     const rect = document.body.getBoundingClientRect();
     console.log(rect);
+  }, []);
+  
+  return <div>Component</div>;
+}`,
+        },
+        // In React.useEffect (member expression)
+        {
+          code: `
+import * as React from 'react';
+
+export default function Component() {
+  React.useEffect(() => {
+    const mql = window.matchMedia('(max-width: 768px)');
+    const onChange = () => {
+      console.log(window.innerWidth);
+    };
+    mql.addEventListener('change', onChange);
+    return () => mql.removeEventListener('change', onChange);
   }, []);
   
   return <div>Component</div>;
