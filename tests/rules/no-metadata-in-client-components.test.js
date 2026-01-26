@@ -1,4 +1,4 @@
-import { test, describe } from 'bun:test';
+import { describe } from 'bun:test';
 import { RuleTester } from 'eslint';
 import rule from '../../lib/rules/no-metadata-in-client-components.js';
 
@@ -13,12 +13,11 @@ const ruleTester = new RuleTester({
 });
 
 describe('no-metadata-in-client-components rule', () => {
-  test('basic cases', () => {
-    ruleTester.run('no-metadata-in-client-components', rule, {
-      valid: [
-        // Server component with metadata (no "use client")
-        {
-          code: `import { Metadata } from 'next'
+  ruleTester.run('no-metadata-in-client-components', rule, {
+    valid: [
+      // Server component with metadata (no "use client")
+      {
+        code: `import { Metadata } from 'next'
 
 export const metadata = {
   title: 'About Us',
@@ -28,10 +27,10 @@ export const metadata = {
 export default function Page() {
   return <div>About</div>
 }`,
-        },
-        // Server component with viewport (no "use client")
-        {
-          code: `
+      },
+      // Server component with viewport (no "use client")
+      {
+        code: `
 export const viewport = {
   width: "device-width",
   initialScale: 1,
@@ -40,50 +39,50 @@ export const viewport = {
 export default function Page() {
   return <div>Page with viewport</div>
 }`,
-        },
-        // Client component without metadata or viewport
-        {
-          code: `"use client";
+      },
+      // Client component without metadata or viewport
+      {
+        code: `"use client";
 
 export default function ClientComponent() {
   return <div>Client Component</div>
 }`,
-        },
-        // Regular exports from client component
-        {
-          code: `"use client";
+      },
+      // Regular exports from client component
+      {
+        code: `"use client";
 
 export const someData = { foo: 'bar' };
 export default function Component() {
   return <div>Component</div>
 }`,
-        },
-        // No exports at all
-        {
-          code: `"use client";
+      },
+      // No exports at all
+      {
+        code: `"use client";
 import { useState } from 'react';
 
 function Component() {
   const [count, setCount] = useState(0);
   return <div>{count}</div>
 }`,
-        },
-        // Server component with re-exported metadata and viewport
-        {
-          code: `import { metadata, viewport } from './metadata';
+      },
+      // Server component with re-exported metadata and viewport
+      {
+        code: `import { metadata, viewport } from './metadata';
 
 export { metadata, viewport };
 
 export default function Page() {
   return <div>About</div>
 }`,
-        },
-      ],
+      },
+    ],
 
-      invalid: [
-        // Client component with direct metadata export
-        {
-          code: `"use client";
+    invalid: [
+      // Client component with direct metadata export
+      {
+        code: `"use client";
 
 import { Metadata } from 'next'
 
@@ -95,15 +94,15 @@ export const metadata = {
 export default function Page() {
   return <div>About</div>
 }`,
-          errors: [
-            {
-              messageId: 'noMetadataInClient',
-            },
-          ],
-        },
-        // Client component with direct viewport export
-        {
-          code: `"use client";
+        errors: [
+          {
+            messageId: 'noMetadataInClient',
+          },
+        ],
+      },
+      // Client component with direct viewport export
+      {
+        code: `"use client";
 
 export const viewport = {
   width: "device-width",
@@ -114,15 +113,15 @@ export const viewport = {
 export default function Page() {
   return <div>Page with viewport</div>
 }`,
-          errors: [
-            {
-              messageId: 'noViewportInClient',
-            },
-          ],
-        },
-        // Client component with both metadata and viewport exports
-        {
-          code: `"use client";
+        errors: [
+          {
+            messageId: 'noViewportInClient',
+          },
+        ],
+      },
+      // Client component with both metadata and viewport exports
+      {
+        code: `"use client";
 
 export const metadata = {
   title: 'About Us',
@@ -137,18 +136,18 @@ export const viewport = {
 export default function Page() {
   return <div>Page with both</div>
 }`,
-          errors: [
-            {
-              messageId: 'noMetadataInClient',
-            },
-            {
-              messageId: 'noViewportInClient',
-            },
-          ],
-        },
-        // Client component with re-exported metadata
-        {
-          code: `"use client";
+        errors: [
+          {
+            messageId: 'noMetadataInClient',
+          },
+          {
+            messageId: 'noViewportInClient',
+          },
+        ],
+      },
+      // Client component with re-exported metadata
+      {
+        code: `"use client";
 
 import { metadata, viewport } from './metadata';
 
@@ -157,18 +156,18 @@ export { metadata, viewport };
 export default function Page() {
   return <div>About</div>
 }`,
-          errors: [
-            {
-              messageId: 'noMetadataInClient',
-            },
-            {
-              messageId: 'noViewportInClient',
-            },
-          ],
-        },
-        // Re-export with renamed import
-        {
-          code: `"use client";
+        errors: [
+          {
+            messageId: 'noMetadataInClient',
+          },
+          {
+            messageId: 'noViewportInClient',
+          },
+        ],
+      },
+      // Re-export with renamed import
+      {
+        code: `"use client";
 
 import { metadata as pageMeta, viewport } from './metadata';
 
@@ -177,18 +176,18 @@ export { pageMeta as metadata, viewport };
 export default function Page() {
   return <div>About</div>
 }`,
-          errors: [
-            {
-              messageId: 'noMetadataInClient',
-            },
-            {
-              messageId: 'noViewportInClient',
-            },
-          ],
-        },
-        // Re-export with renamed viewport
-        {
-          code: `"use client";
+        errors: [
+          {
+            messageId: 'noMetadataInClient',
+          },
+          {
+            messageId: 'noViewportInClient',
+          },
+        ],
+      },
+      // Re-export with renamed viewport
+      {
+        code: `"use client";
 
 import { viewport as pageViewport } from './metadata';
 
@@ -197,15 +196,15 @@ export { pageViewport as viewport };
 export default function Page() {
   return <div>Page</div>
 }`,
-          errors: [
-            {
-              messageId: 'noViewportInClient',
-            },
-          ],
-        },
-        // Use client with single quotes
-        {
-          code: `'use client';
+        errors: [
+          {
+            messageId: 'noViewportInClient',
+          },
+        ],
+      },
+      // Use client with single quotes
+      {
+        code: `'use client';
 
 export const metadata = {
   title: 'Contact Us',
@@ -215,15 +214,15 @@ export const metadata = {
 export default function Page() {
   return <div>Contact</div>
 }`,
-          errors: [
-            {
-              messageId: 'noMetadataInClient',
-            },
-          ],
-        },
-        // Full example from the error (without TypeScript)
-        {
-          code: `"use client";
+        errors: [
+          {
+            messageId: 'noMetadataInClient',
+          },
+        ],
+      },
+      // Full example from the error (without TypeScript)
+      {
+        code: `"use client";
 
 import { motion } from 'framer-motion'
 import { Card, CardContent } from '@/components/ui/card'
@@ -237,15 +236,15 @@ export const metadata = {
 export default function AboutPage() {
   return <div>About</div>
 }`,
-          errors: [
-            {
-              messageId: 'noMetadataInClient',
-            },
-          ],
-        },
-        // Example matching your current error
-        {
-          code: `'use client'
+        errors: [
+          {
+            messageId: 'noMetadataInClient',
+          },
+        ],
+      },
+      // Example matching your current error
+      {
+        code: `'use client'
 
 import "@/styles/globals.css";
 import React from "react";
@@ -274,13 +273,12 @@ export default function RootLayout({
     </html>
   );
 }`,
-          errors: [
-            {
-              messageId: 'noViewportInClient',
-            },
-          ],
-        },
-      ],
-    });
+        errors: [
+          {
+            messageId: 'noViewportInClient',
+          },
+        ],
+      },
+    ],
   });
 });
