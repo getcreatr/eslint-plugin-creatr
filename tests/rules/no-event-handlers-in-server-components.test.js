@@ -115,6 +115,24 @@ export default function Page() {
 }`,
         options: [{ checkCustomComponents: false }],
       },
+      // Passing `undefined` to an on* prop on a custom component is serializable
+      {
+        code: `export default function Page() {
+  return <CustomButton onClick={undefined} />
+}`,
+      },
+      // Passing `null` literal to an on* prop on a custom component
+      {
+        code: `export default function Page() {
+  return <CustomButton onClick={null} />
+}`,
+      },
+      // Passing booleans / numbers (e.g. flags) to on* props — not functions
+      {
+        code: `export default function Page() {
+  return <CustomButton onReady={false} onCount={0} />
+}`,
+      },
     ],
     invalid: [
       // Simple onClick handler

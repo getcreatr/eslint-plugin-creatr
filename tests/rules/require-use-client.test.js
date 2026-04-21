@@ -133,6 +133,29 @@ export default function Component() {
   return <div>{count}</div>;
 }`,
       },
+      // Custom component with on* prop — not a DOM event, so no "use client" needed
+      {
+        code: `import { AppTopbar } from './AppTopbar';
+
+export default async function Layout() {
+  return <AppTopbar onSignOut={undefined} />;
+}`,
+      },
+      // Custom component with on* prop bound to a server action identifier
+      {
+        code: `import { AvatarDropdown } from './AvatarDropdown';
+import { signOutAction } from './actions';
+
+export default async function Layout() {
+  return <AvatarDropdown onSignOut={signOutAction} />;
+}`,
+      },
+      // Intrinsic element with on* prop holding `undefined` — not a real handler
+      {
+        code: `export default function Component({ handler }) {
+  return <button onClick={undefined}>Click</button>;
+}`,
+      },
       // Complex component with "use client"
       {
         code: `"use client";
