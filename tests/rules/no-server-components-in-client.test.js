@@ -172,6 +172,20 @@ const el = AsyncServerComp({ children: null });
 export default function Page() { return <div />; }`,
         filename: clientFile,
       },
+
+      // ── Server component passed as a prop value, not rendered as JSX ───────
+      // AsyncServerComp is in localServerImports but never appears as a
+      // JSXOpeningElement name — the rule's JSXOpeningElement visitor only
+      // checks node.name, not attribute values.
+      {
+        code: `'use client';
+import AsyncServerComp from '../components/AsyncServerComp';
+function Wrapper({ component: Comp }) { return null; }
+export default function Page() {
+  return <Wrapper component={AsyncServerComp} />;
+}`,
+        filename: clientFile,
+      },
     ],
 
     invalid: [
@@ -245,6 +259,41 @@ export default function Page() {
 import Widget from '../features/dashboard/Widget';
 export default function Page() {
   return <Widget />;
+}`,
+        filename: clientFile,
+        errors: [{ messageId: 'serverComponentInClient' }],
+      },
+
+      // ── Conditional (&&) JSX renders server component ─────────────────────
+      // The JSXOpeningElement visitor fires regardless of whether the element
+      // is inside a logical expression.
+      {
+        code: `'use client';
+import AsyncServerComp from '../components/AsyncServerComp';
+export default function Page({ isLoading }) {
+  return <div>{isLoading && <AsyncServerComp />}</div>;
+}`,
+        filename: clientFile,
+        errors: [{ messageId: 'serverComponentInClient' }],
+      },
+
+      // ── Ternary JSX renders server component ─────────────────────────────
+      {
+        code: `'use client';
+import AsyncServerComp from '../components/AsyncServerComp';
+export default function Page({ condition }) {
+  return <div>{condition ? <AsyncServerComp /> : null}</div>;
+}`,
+        filename: clientFile,
+        errors: [{ messageId: 'serverComponentInClient' }],
+      },
+
+      // ── Map callback renders server component ─────────────────────────────
+      {
+        code: `'use client';
+import AsyncServerComp from '../components/AsyncServerComp';
+export default function Page({ items }) {
+  return <ul>{items.map(i => <AsyncServerComp key={i} />)}</ul>;
 }`,
         filename: clientFile,
         errors: [{ messageId: 'serverComponentInClient' }],

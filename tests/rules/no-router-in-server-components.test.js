@@ -39,6 +39,23 @@ describe('no-router-in-server-components rule', () => {
       {
         code: `import { revalidatePath, redirect } from 'next/navigation'`,
       },
+      // All server-safe hooks in one import
+      {
+        code: `import { redirect, notFound, permanentRedirect, revalidatePath } from 'next/navigation'`,
+      },
+      // hook from a different package is fine
+      {
+        code: `import { useRouter } from 'some-other-package'`,
+      },
+      // type import — must NOT be flagged (requires TypeScript parser)
+      {
+        code: `import type { useRouter } from 'next/navigation'`,
+        parser: require.resolve('@typescript-eslint/parser'),
+      },
+      {
+        code: `import type { usePathname, useSearchParams } from 'next/navigation'`,
+        parser: require.resolve('@typescript-eslint/parser'),
+      },
     ],
 
     invalid: [
@@ -105,6 +122,23 @@ describe('no-router-in-server-components rule', () => {
             data: { hook: 'useRouter' },
           },
         ],
+      },
+      // comment 'use client' does not count — not a directive
+      {
+        code: `// 'use client'
+import { useRouter } from 'next/navigation'`,
+        errors: [{ messageId: 'hookRequiresClient', data: { hook: 'useRouter' } }],
+      },
+      // file with 'use server' directive (explicit server component)
+      {
+        code: `'use server';
+import { useRouter } from 'next/navigation'`,
+        errors: [{ messageId: 'hookRequiresClient', data: { hook: 'useRouter' } }],
+      },
+      // mixed import — only useRouter is flagged, redirect is not
+      {
+        code: `import { useRouter, redirect } from 'next/navigation'`,
+        errors: [{ messageId: 'hookRequiresClient', data: { hook: 'useRouter' } }],
       },
     ],
   });

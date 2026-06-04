@@ -41,6 +41,16 @@ describe('no-pages-router-imports-in-app rule', () => {
         code: `export default function Page() { return <div>Hello</div>; }`,
         filename: '/project/app/page.tsx',
       },
+      // File named app.tsx but NOT in /app/ directory — must NOT trigger
+      {
+        code: `import { useRouter } from 'next/router';`,
+        filename: '/Users/project/src/components/app.tsx',
+      },
+      // my-app/ directory — not the /app/ router directory
+      {
+        code: `import { useRouter } from 'next/router';`,
+        filename: '/Users/project/src/my-app/components/foo.tsx',
+      },
     ],
 
     invalid: [
@@ -66,6 +76,17 @@ describe('no-pages-router-imports-in-app rule', () => {
       {
         code: `import * as Router from 'next/router';`,
         filename: '/project/app/layout.tsx',
+        errors: [{ messageId: 'useNavigationInstead' }],
+      },
+      // Re-export from next/router inside app/ — also wrong paradigm
+      {
+        code: `export { useRouter } from 'next/router';`,
+        filename: '/project/src/app/utils.ts',
+        errors: [{ messageId: 'useNavigationInstead' }],
+      },
+      {
+        code: `export { useRouter, usePathname } from 'next/router';`,
+        filename: '/project/src/app/layout.tsx',
         errors: [{ messageId: 'useNavigationInstead' }],
       },
     ],
