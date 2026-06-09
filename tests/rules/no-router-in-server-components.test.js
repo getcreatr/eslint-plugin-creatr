@@ -17,43 +17,43 @@ describe('no-router-in-server-components rule', () => {
     valid: [
       // Has "use client" — useRouter is OK
       {
-        code: `'use client'; import { useRouter } from 'next/navigation'`,
+        code: '\'use client\'; import { useRouter } from \'next/navigation\'',
       },
       // Has "use client" — multiple hooks are OK
       {
-        code: `'use client'; import { usePathname, useSearchParams } from 'next/navigation'`,
+        code: '\'use client\'; import { usePathname, useSearchParams } from \'next/navigation\'',
       },
       // Server-safe hook, no "use client" needed
       {
-        code: `import { redirect } from 'next/navigation'`,
+        code: 'import { redirect } from \'next/navigation\'',
       },
       // Server-safe hook, no "use client" needed
       {
-        code: `import { notFound } from 'next/navigation'`,
+        code: 'import { notFound } from \'next/navigation\'',
       },
       // Not from next/navigation
       {
-        code: `import { useRouter } from 'some-other-pkg'`,
+        code: 'import { useRouter } from \'some-other-pkg\'',
       },
       // All server-safe
       {
-        code: `import { revalidatePath, redirect } from 'next/navigation'`,
+        code: 'import { revalidatePath, redirect } from \'next/navigation\'',
       },
       // All server-safe hooks in one import
       {
-        code: `import { redirect, notFound, permanentRedirect, revalidatePath } from 'next/navigation'`,
+        code: 'import { redirect, notFound, permanentRedirect, revalidatePath } from \'next/navigation\'',
       },
       // hook from a different package is fine
       {
-        code: `import { useRouter } from 'some-other-package'`,
+        code: 'import { useRouter } from \'some-other-package\'',
       },
       // type import — must NOT be flagged (requires TypeScript parser)
       {
-        code: `import type { useRouter } from 'next/navigation'`,
+        code: 'import type { useRouter } from \'next/navigation\'',
         parser: require.resolve('@typescript-eslint/parser'),
       },
       {
-        code: `import type { usePathname, useSearchParams } from 'next/navigation'`,
+        code: 'import type { usePathname, useSearchParams } from \'next/navigation\'',
         parser: require.resolve('@typescript-eslint/parser'),
       },
     ],
@@ -61,7 +61,7 @@ describe('no-router-in-server-components rule', () => {
     invalid: [
       // No "use client" — useRouter flagged
       {
-        code: `import { useRouter } from 'next/navigation'`,
+        code: 'import { useRouter } from \'next/navigation\'',
         errors: [
           {
             messageId: 'hookRequiresClient',
@@ -71,7 +71,7 @@ describe('no-router-in-server-components rule', () => {
       },
       // No "use client" — usePathname flagged
       {
-        code: `import { usePathname } from 'next/navigation'`,
+        code: 'import { usePathname } from \'next/navigation\'',
         errors: [
           {
             messageId: 'hookRequiresClient',
@@ -81,7 +81,7 @@ describe('no-router-in-server-components rule', () => {
       },
       // No "use client" — useSearchParams flagged
       {
-        code: `import { useSearchParams } from 'next/navigation'`,
+        code: 'import { useSearchParams } from \'next/navigation\'',
         errors: [
           {
             messageId: 'hookRequiresClient',
@@ -91,7 +91,7 @@ describe('no-router-in-server-components rule', () => {
       },
       // No "use client" — useParams flagged
       {
-        code: `import { useParams } from 'next/navigation'`,
+        code: 'import { useParams } from \'next/navigation\'',
         errors: [
           {
             messageId: 'hookRequiresClient',
@@ -101,7 +101,7 @@ describe('no-router-in-server-components rule', () => {
       },
       // Two hooks — two errors
       {
-        code: `import { useRouter, usePathname } from 'next/navigation'`,
+        code: 'import { useRouter, usePathname } from \'next/navigation\'',
         errors: [
           {
             messageId: 'hookRequiresClient',
@@ -115,7 +115,7 @@ describe('no-router-in-server-components rule', () => {
       },
       // Mixed: server-safe + hook — only hook flagged
       {
-        code: `import { redirect, useRouter } from 'next/navigation'`,
+        code: 'import { redirect, useRouter } from \'next/navigation\'',
         errors: [
           {
             messageId: 'hookRequiresClient',
@@ -137,7 +137,7 @@ import { useRouter } from 'next/navigation'`,
       },
       // mixed import — only useRouter is flagged, redirect is not
       {
-        code: `import { useRouter, redirect } from 'next/navigation'`,
+        code: 'import { useRouter, redirect } from \'next/navigation\'',
         errors: [{ messageId: 'hookRequiresClient', data: { hook: 'useRouter' } }],
       },
     ],

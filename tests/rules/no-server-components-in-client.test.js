@@ -72,7 +72,7 @@ export const Card = React.forwardRef(({ className, ...props }, ref) => (
 Card.displayName = 'Card';`;
 
 // A utility file — no JSX, no "use client"
-const UTIL = `export function formatDate(d) { return d.toISOString(); }`;
+const UTIL = 'export function formatDate(d) { return d.toISOString(); }';
 
 const root = makeFixture({
   'src/components/AsyncServerComp.tsx': ASYNC_SERVER_COMP,
