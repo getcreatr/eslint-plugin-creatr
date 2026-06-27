@@ -1,6 +1,6 @@
 {
   "name": "eslint-plugin-creatr",
-  "version": "1.2.8",
+  "version": "1.2.9",
   "description": "Custom ESLint rules for Next.js projects by Creatr",
   "main": "lib/index.js",
   "files": [
