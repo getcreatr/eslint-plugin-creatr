@@ -63,7 +63,7 @@ describe('no-imperative-navigation rule', () => {
       // Matching only object properties misses this shape entirely.
       {
         filename: APP,
-        code: `${R}\nconst A = () => <QuestionForm onSuccess={(r) => { router.push(`+"`"+`/admin/knowledge/questions/${'${'}r.id}`+"`"+`); }} />;`,
+        code: `${R}\nconst A = () => <QuestionForm onSuccess={(r) => { router.push(`+'`'+`/admin/knowledge/questions/${'${'}r.id}`+'`'+'); }} />;',
       },
       // Sequenced after an await — two-tap-reason-form.tsx:70. A <Link> navigates
       // on click; it cannot wait for an async step to resolve first.
@@ -86,7 +86,7 @@ describe('no-imperative-navigation rule', () => {
       // ── Not a Next router ────────────────────────────────────────────────
       {
         filename: APP,
-        code: `const history = createHistory(); function f(){ history.push('/x'); }`,
+        code: 'const history = createHistory(); function f(){ history.push(\'/x\'); }',
       },
       // A comment showing the pattern is not a call — list-results.tsx:48
       {
@@ -187,7 +187,7 @@ describe('no-imperative-navigation rule', () => {
       // ── Detection must survive a renamed router variable ─────────────────
       {
         filename: APP,
-        code: `const r = useRouter();\nconst A = () => <Button onClick={() => r.push('/x')} />;`,
+        code: 'const r = useRouter();\nconst A = () => <Button onClick={() => r.push(\'/x\')} />;',
         errors: [{ messageId: 'imperativeNav' }],
       },
 
