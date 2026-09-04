@@ -46,6 +46,14 @@ Next.js ships its own `@next/next/no-img-element`, but it has no options and no 
 // Genuinely unmeasurable, with the reason recorded
 {/* img-reason: arbitrary uploaded document in a viewer; no determinate box to give fill */}
 <img src={src} alt={fileName} />
+
+// Same-origin route that redirects (302) to storage, never returns bytes —
+// next/image invokes it in-process (no real HTTP fetch) and gets an empty
+// body. This applies whether the redirect target is an SVG or a raster
+// image — it is not an SVG-optimisation case.
+{/* img-reason: /api/profile/photo redirects to storage; next/image's internal
+    fetch cannot follow a 302 with no body ("internal image response is empty") */}
+<img src={avatarSrc} alt={name} />
 ```
 
 The annotation is greppable on purpose — `grep -rn "img-reason:"` returns every exception in the codebase together with its rationale.
